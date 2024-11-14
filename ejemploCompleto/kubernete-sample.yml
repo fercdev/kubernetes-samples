@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: codigo
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: codigo-configmap
+  namespace: codigo
+data:
+  APP_CONFIG_NAME: "HELLO WORLD CODIGO"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: codigo-secret
+  namespace: codigo
+type: Opaque
+data:
+  firstname: ZmVybmFuZG8=
+  lastname: Y3J1eg==
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codigo-deployment
+  namespace: codigo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: codigo-app
+  template:
+    metadata:
+      labels:
+        app: codigo-app
+    spec:
+      containers:
+      - name: codigo-container
+        image: nginx
+        envFrom:
+          - configMapRef:
+              name: codigo-configmap
+          - secretRef:
+              name: codigo-secret
+        volumeMounts:
+          - name: codigo-secret-volume
+            mountPath: /etc/codigo-secret-volume
+            readOnly: true
+      volumes:
+        - name: codigo-secret-volume
+          secret:
+            secretName: codigo-secret
