@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-v1
+spec:
+  replicas: 3
+  revisionHistoryLimit: 20
+  selector:
+    matchLabels:
+      app: app-v1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: app-v1
+    spec:
+      containers:
+      - name: app-v1-container
+        image: nginx:alpine
+        ports:
+        - containerPort: 80

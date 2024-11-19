@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-completo # definicion del nombre de mi deployment
+  #namespace: my-namespace # definicion del nombre de namespace
+  labels:
+    app: my-web-application
+    env: production
+spec:
+  replicas: 2 # cantidad de pods que deseo en mi aplicacion
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1     # cantidad de pods adicionales durante la actualizacion
+      maxUnavailable: 1 # cantidad de pods inactivos durante la actualizacion
+  selector:
+    matchLabels:
+      app: deployment-completo  #etiqueta de identificacion del pod 
+  template:
+    metadata:                   # referencia de la etiqueta del pod
+      labels:
+        app: deployment-completo
+    spec:                         # todo lo relacionado ala configuracion del pod y del contenedor
+      containers:
+      - name: deployment-completo-container   #nombre de container
+        image: nginx:alpine                   #imagen del container
+        resources:                            #recursos del pod (memoria y cpu)
+          requests:
+            memory: "8Mi"
+            cpu: "10m" # 1% del nucleo de cpu
+          limits:
+            memory: "16Mi"
+            cpu: "50m" #5 % del nucleo de cpu
+        ports:                              #definicion del puerto del contenedor
+        - containerPort: 80
+        env:                                #variable de entorno de mi pod
+        - name: BASE_URL
+          value: http://localhost/api
+        - name: APP_VERSION
+          value: "1.0"
+        livenessProbe:                      # verifica que mi contenedor esta operativo o funcionando de manera correcta
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:                     # verificando si el contenedor esta listo para recibir trafico 
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
