@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp
+  namespace: mi-namespace #opcional
+  labels: #opcional
+    app: web-nginx
+    env: dev
+  annotations: #opcional
+    owner: equipo1
+  #creationTimestamp: "2024-11-18T12:00"  #automatico
+  # ownerReferences:
+  #   - apiVersion: 
+  generation: 2
+  finalizers: #opcional
+    - ruta.com/updated
+data:
+  key: value

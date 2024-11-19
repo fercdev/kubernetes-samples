@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-directorio
+  labels:
+    name: pod-directorio
+spec:
+  containers:
+  - name: pod-directorio-container
+    image: nginx
+    volumeMounts:
+    - name: config-volume-directorio
+      mountPath: /etc/config
+  volumes:
+  - name: config-volume-directorio
+    configMap:
+      name: configmap-directorio
+    
