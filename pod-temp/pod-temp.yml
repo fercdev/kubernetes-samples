@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-temp
+  namespace: proyecto-demo
+spec:
+  containers:
+    - name: pod-temp-container
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+      - name: logs-volume
+        mountPath: "/mnt/logs"
+  volumes:
+  - name: logs-volume
+    persistentVolumeClaim:
+      claimName: proyecto-pvc
