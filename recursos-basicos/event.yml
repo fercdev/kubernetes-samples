@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Event
+metadata:
+  name: c-event
+  namespace: default
+involvedObject:
+  kind: Pod
+  name: app-v1-695dd5c4b5-j6s66
+  namespace: default
+type: Normal #tambien existe el tipo Warning
+reason: CustomEvent
+message: "CustomMessage desde el evento"
+source:
+  component: custom-controller

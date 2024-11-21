@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: proyecto-demo
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: poyecto-pv
+  namespace: proyecto-demo
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/demo-logs"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: proyecto-pvc
+  namespace: proyecto-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proyecto-nginx-deployment
+  namespace: proyecto-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: proyecto-nginx
+  template:
+    metadata:
+      labels:
+        app: proyecto-nginx
+    spec:
+      containers:
+        - name: proyecto-nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /var/log/nginx
+              name: log-volume
+      volumes:
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: proyecto-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proyecto-nginx-service
+  namespace: proyecto-demo
+spec:
+  selector:
+    app: proyecto-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: "ClusterIP"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: proyecto-nginx-ingress
+  namespace: proyecto-demo
+spec:
+  rules:
+    - host: proyecto-nginx.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: proyecto-nginx-service
+                port:
+                  number: 80
