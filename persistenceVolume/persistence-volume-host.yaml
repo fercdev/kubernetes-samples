@@ -9,8 +9,9 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
   hostPath:
-    path: /minikube-host/data1
+    path: /mnt/data1
     type: Directory
 
 ---
@@ -25,6 +26,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: manual
 
 ---
 apiVersion: v1
@@ -38,7 +40,7 @@ spec:
       command: ["sh", "-c", "sleep 3600"]
       volumeMounts:
       - name: data-volume
-        mountPath: "/data1"
+        mountPath: "/mnt/data1"
   volumes:
     - name: data-volume
       persistentVolumeClaim:
