@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-host
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /minikube-host/data1
+    type: Directory
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-host
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-pod
+spec:
+  containers:
+    - name: pod-temp-container
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+      - name: data-volume
+        mountPath: "/data1"
+  volumes:
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: pvc-host
