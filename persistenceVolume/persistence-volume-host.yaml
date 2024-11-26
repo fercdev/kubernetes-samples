@@ -8,10 +8,10 @@ spec:
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
+  persistentVolumeReclaimPolicy: Delete #Retain Delete #Recycle
   storageClassName: manual
   hostPath:
-    path: /mnt/data1
+    path: /tmp/data1
     type: Directory
 
 ---

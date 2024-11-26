@@ -1,0 +1,41 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sc-viernes
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  path: "/tmp/data1"
+reclaimPolicy: Retain
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sc-viernes-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: sc-viernes
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sc-viernes-pod
+spec:
+  containers:
+    - name: sc-viernes-container
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+      - name: data-volume
+        mountPath: "/tmp/data1"
+  volumes:
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: sc-viernes-pvc

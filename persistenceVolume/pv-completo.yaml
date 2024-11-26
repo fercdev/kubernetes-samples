@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-host
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem #Filesystem(defecto), Block(bloques)
+  accessModes:
+    - ReadWriteOnce # ReadOnlyMany, ReadWriteMany 
+  persistentVolumeReclaimPolicy: Delete #Retain Delete #Recycle
+  storageClassName: manual
+  local:
+    path: /mnt/disk # ruta del almacenamiento local
+  hostPath:
+    path: /tmp/data1
+    type: Directory
+  awsElasticBlockStore:
+    volumeID: vol-xxxxxxx
+    fsType: ext4
+  nfs:
+    path: /ruta/pathcompleto
+    server: nfs-server.com
+  gcePersistentDisk:
+    pdName: nombre-disk
+    fsType: ext4
+  
