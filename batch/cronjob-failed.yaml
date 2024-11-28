@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-failed
+spec:
+  schedule: "* * * * *" #se ejecuta cada minuto
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cronjob-failed-container
+              image: busybox
+              command: ["sh", "-c", "exit 1"]
+          restartPolicy: Never
