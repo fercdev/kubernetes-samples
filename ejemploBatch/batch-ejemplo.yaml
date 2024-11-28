@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-logs-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/nginx-logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-logs-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx:alpine
+    volumeMounts:
+    - name: nginx-logs
+      mountPath: /var/logs/nginx
+  volumes:
+  - name: nginx-logs
+    persistentVolumeClaim:
+      claimName: nginx-logs-pvc
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: limpiar-nginx-logs
+spec:
+  schedule: "*/3 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: limpiador-logs-nginx
+            image: busybox
+            command: ["sh" , "-c", "rm -f /var/logs/nginx/*"]
+            volumeMounts:
+            - name: nginx-logs
+              mountPath: /var/logs/nginx
+          restartPolicy: OnFailure
+          volumes:
+          - name: nginx-logs
+            persistentVolumeClaim:
+              claimName: nginx-logs-pvc

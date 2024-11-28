@@ -4,13 +4,15 @@ metadata:
   name: cronjob-failed
 spec:
   schedule: "* * * * *" #se ejecuta cada minuto
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      backoffLimit: 2
       template:
         spec:
           containers:
             - name: cronjob-failed-container
               image: busybox
               command: ["sh", "-c", "exit 1"]
-          restartPolicy: Never
+          restartPolicy: OnFailure
