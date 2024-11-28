@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-completo
+spec:
+  completions: 2 # (opcional) (defetcto: 1) cantidad de ejecuciones exitosas
+  parallelism: 2 # (opcional) (defecto: 1)cantidad de pods que ejecutaran la actividad en paralelo
+  backoffLimit: 4 # (opcional) (defecto: 6)  cantidad de veces que reintentaria nuestro pod
+  activeDeadlineSeconds: 300 # (opcional) (tiempo en segundos en el que el job se deberia de ejecutar)
+  ttlSecondsAfterFinished: 300 # (opcional) tiempo en que los recursos del job aun estan disponibles dentro del cluster. [ideal para limpieza de recursos] 
+  template: # (obligatorio)
+    spec:
+      containers:
+      - name: demo-job-container
+        image: busybox
+        command: ["echo", "Tarea finalizada"]
+      restartPolicy: Never

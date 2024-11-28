@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Cronjob
+metadata:
+  name: cronjob-demo
+spec:
+  schedule: "*/5 * * * *" # (obligatorio) periodo de tiempo en que se ejecutara mi actividad
+  startingDeadlineSeconds: 300 # (opcional) tiempo maximo para que kubernetes comience la ejecucion programada
+  concurrencyPolicy: Forbid # (opcional) [Allow](defecto), [Forbid]evita que inicie un nuevo trabjo si ya esta otro en ejecucion [Replace]
+  successfulJobsHistoryLimit: 4 #(opcional)(defecto: 3)-> numero maximo de jobs correctos que se tendran en el historial
+  failedJobsHistoryLimit: 3 # (opcional)(defecto: 1)
+  jobTemplate:
+    spec:
+      completions: 1
+      template:
+        spec:
+          containers:
+          - name: cronjob-demo-container
+            image: busybox
+            command: ["date"]
+          restartPolicy: Never

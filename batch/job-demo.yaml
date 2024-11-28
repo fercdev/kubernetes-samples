@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: demo-job
+spec:
+  #completions: 2 # cantidad de ejecuciones exitosas
+  #parallelism: 2 # cantidad de pods que ejecutaran la actividad en paralelo
+  # backoffLimit: 4 cantidad de veces que reintentaria nuestro pod
+  template:
+    spec:
+      containers:
+      - name: demo-job-container
+        image: busybox
+        command: ["echo", "Tarea finalizada"]
