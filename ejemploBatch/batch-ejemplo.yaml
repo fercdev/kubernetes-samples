@@ -32,7 +32,7 @@ spec:
     image: nginx:alpine
     volumeMounts:
     - name: nginx-logs
-      mountPath: /var/logs/nginx
+      mountPath: /var/log/nginx
   volumes:
   - name: nginx-logs
     persistentVolumeClaim:
@@ -52,10 +52,17 @@ spec:
           containers:
           - name: limpiador-logs-nginx
             image: busybox
-            command: ["sh" , "-c", "rm -f /var/logs/nginx/*"]
+            command: #["sh" , "-c", "rm -f /var/log/nginx/*"]
+            - "sh"
+            - "-c"
+            - |
+              # Agregando comentario
+              echo "Limpiando archivos y carpetas..."
+              rm -f /var/log/nginx/*
+
             volumeMounts:
             - name: nginx-logs
-              mountPath: /var/logs/nginx
+              mountPath: /var/log/nginx
           restartPolicy: OnFailure
           volumes:
           - name: nginx-logs
