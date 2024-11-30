@@ -64,7 +64,7 @@ kind: CronJob
 metadata:
   name: mysql-backup
 spec:
-  schedule: "*/3 * * * *" # cada 3 minutos
+  schedule: "*/2 * * * *" # cada 2 minutos
   jobTemplate:
     spec:
       template:
@@ -84,5 +84,7 @@ spec:
           restartPolicy: OnFailure
           volumes:
           - name: backup-volume
-            emptyDir: {}
+            hostPath:
+              path: /data/backups
+              type: DirectoryOrCreate
           
