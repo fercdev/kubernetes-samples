@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: port-forward-role
-  namespace: default
+  namespace: permission-manager
 rules:
   - apiGroups: [""]
     resources: ["pods/portforward"]
@@ -13,7 +13,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: port-forward-binding
-  namespace: default
+  namespace: permission-manager
 subjects:
   - kind: User
     name: minikube
