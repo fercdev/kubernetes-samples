@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: penahidalgonms
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: penahidalgoconf
+  namespace: penahidalgonms
+data:
+  NOMBRES: "Pavel Marcello"
+  APELLIDOS: "Peña Hidalgo"
+  EDAD: "47"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secretph
+  namespace: penahidalgonms
+type: Opaque
+data:
+  clave: T1JRVUVTVEFET1JFUw==
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: persistentvolumeph
+  namespace: penahidalgonms
+spec:
+  capacity:
+    storage: 3Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /tmp/log-nginx
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: persistentvolumeclaimph
+  namespace: penahidalgonms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: manual
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploymentph
+  namespace: penahidalgonms
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ph-nginx
+  template:
+    metadata:
+      labels:
+        app: ph-nginx
+    spec:
+      containers:
+      - name: ph-nginx-container
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/log/nginx"
+        envFrom:
+        - configMapRef:
+            name: penahidalgoconf
+        env:
+          - name: CLAVE
+            valueFrom:
+              secretKeyRef:
+                name: secretph
+                key: clave
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: persistentvolumeclaimph
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-service-lb
+    namespace: penahidalgonms
+spec:
+  selector:
+    app: ph-nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+  

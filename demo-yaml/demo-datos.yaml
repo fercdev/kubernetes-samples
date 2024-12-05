@@ -1,0 +1,121 @@
+# creación del namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: angulo
+---
+# creación del PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-tarea
+  namespace: angulo
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/demo-logs"
+---
+# creacón del PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-tarea
+  namespace: angulo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# creación del Configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-tarea
+  namespace: angulo
+data:
+  NOMBRES: "Roberto Luis"
+  APELLIDOS: "Angulo Vásquez"
+  EDAD: "Adulto :-)"
+---
+# creación del Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-tarea
+  namespace: angulo
+type: Opaque
+data:
+  secreto: T1JRVUVTVEFET1JFUw==
+---
+# creación del deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tarea-nginx-deployment
+  namespace: angulo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: proyecto-nginx
+  template:
+    metadata:
+      labels:
+        app: proyecto-nginx
+    spec:
+      containers:
+        - name: tarea-nginx-container
+          image: nginx
+          envFrom:
+            - configMapRef:
+                name: config-tarea
+            - secretRef:
+                name: secret-tarea
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /var/log/nginx
+              name: log-volume
+      volumes:
+        - name: log-volume
+          persistentVolumeClaim:
+            claimName: pvc-tarea
+---
+# creación del service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tarea-nginx-service
+  namespace: angulo
+spec:
+  selector:
+    app: tarea-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: "NodePort" #ClusterIP para suar el service "Ingress"
+---
+# creación del ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tarea-nginx-ingress
+  namespace: angulo
+spec:
+  rules:
+    - host: tarea-nginx.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: tarea-nginx-service
+                port:
+                  number: 80
