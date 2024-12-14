@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-prometheus-monitor
+spec:
+  selector:
+    matchLabels:
+      app: node-prometheus-monitor
+  template:
+    metadata:
+      labels:
+        app: node-prometheus-monitor
+    spec:
+      containers:
+        - name: node-prometheus-monitor-container
+          image: prom/node-exporter:latest
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
