@@ -14,10 +14,13 @@ spec:
         app: mysql
     spec:
       containers:
-      - name: mysql_container
+      - name: mysql-container
         image: mysql:5.7
         ports:
         - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rootpassword
         volumeMounts:
         - name: mysql-data
           mountPath: /var/lib/mysql
