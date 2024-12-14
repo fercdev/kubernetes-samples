@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nginx-dp-ext
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: nginx-dp-ext
@@ -13,8 +13,15 @@ spec:
         app: nginx-dp-ext
     spec:
       containers:
-      - name: nginx-container-ext
+      - name: nginx-container
         image: nginx
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
         ports:
         - containerPort: 80
   strategy:
