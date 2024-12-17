@@ -1,0 +1,21 @@
+apiVersion: autoscaling/v2
+kind: VerticalPodAutoscaler
+metadata:
+  name: sample-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp
+  updatePolicy:
+    updateMode: "Auto" # puede ser "Auto", "Off", "Initial"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      mode: "Auto"
+      minAllowed:
+        cpu: 200m
+        memory: 256Mi
+      maxAllowed:
+        cpu: 500m
+        memory: 2Gi
